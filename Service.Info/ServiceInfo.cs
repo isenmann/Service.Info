@@ -36,5 +36,7 @@ namespace Service.Info
 
         public void SetServiceAction(string serviceName, ServiceAction action) =>
             _serviceInfo.SetServiceAction(serviceName, action);
+
+        public void GetService(string serviceName) => _serviceInfo.GetService(serviceName);
     }
 }

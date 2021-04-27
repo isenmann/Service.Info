@@ -9,7 +9,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Computer;Service;Info;Information;NET Standard;Windows;Linux;macOS</PackageTags>
     <Description>Service.Info is a .NET Standard 2.1 library for receiving information about services/daemons on Windows and Linux. Mac support will maybe follow</Description>
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
     <Product>Service.Info</Product>
     <Company>Daniel Isenmann</Company>
     <PackageId>Service.Info</PackageId>

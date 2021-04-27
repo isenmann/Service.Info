@@ -66,6 +66,50 @@ namespace Service.Info.Windows
             return services;
         }
 
+        public Service GetService(string serviceName)
+        {
+            using var win32Service = new ManagementObjectSearcher($"SELECT * FROM Win32_Service WHERE Name = '{serviceName}'");
+
+            foreach (var queryObject in win32Service.Get())
+            {
+                var service = new Service
+                {
+                    Name = GetPropertyString(queryObject["Name"]),
+                    ProcessId = GetPropertyValue<uint>(queryObject["ProcessId"])
+                };
+                var state = GetPropertyString(queryObject["State"]);
+                service.State = state switch
+                {
+                    "Stopped" => ServiceState.Stopped,
+                    "Start Pending" => ServiceState.StartPending,
+                    "Stop Pending" => ServiceState.StopPending,
+                    "Running" => ServiceState.Running,
+                    "Continue Pending" => ServiceState.ContinuePending,
+                    "Pause Pending" => ServiceState.PausePending,
+                    "Paused" => ServiceState.Paused,
+                    "Unknown" => ServiceState.Unknown,
+                    _ => service.State
+                };
+
+                if (service.State == ServiceState.Running)
+                {
+                    using var win32PerfFormattedDataPerfProcProcess = new ManagementObjectSearcher(
+                        $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}");
+
+                    foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
+                    {
+                        service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
+                        service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
+                        service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
+                    }
+                }
+
+                return service;
+            }
+
+            return null;
+        }
+
         public void SetServiceAction(string serviceName, ServiceAction action)
         {
             using var classInstance = new ManagementObject($"Win32_Service.Name = '{serviceName}'", null);

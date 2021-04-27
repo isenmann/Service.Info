@@ -33,6 +33,7 @@ namespace Service.Info.Linux
 
                 service.Name = split.Last();
 
+
                 var systemctlOutput = ReadProcessOutput("systemctl", $"status {service.Name}");
                 var systemctlOutputLines = systemctlOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -60,6 +61,66 @@ namespace Service.Info.Linux
             }
             
             return serviceList;
+        }
+
+        public Service GetService(string serviceName)
+        {
+            var processOutput = ReadProcessOutput("service", "--status-all");
+            var lines = processOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                var name = line.Split(" ").Last();
+                if (!name.Equals(serviceName))
+                {
+                    continue;
+                }
+
+                var service = new Service
+                {
+                    Name = name
+                };
+
+                if (line.Contains("[ + ]"))
+                {
+                    service.State = ServiceState.Running;
+                }
+                else if (line.Contains("[ - ]"))
+                {
+                    service.State = ServiceState.Stopped;
+                }
+                else
+                {
+                    service.State = ServiceState.Unknown;
+                }
+                
+                var systemctlOutput = ReadProcessOutput("systemctl", $"status {service.Name}");
+                var systemctlOutputLines = systemctlOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                var pid = systemctlOutputLines.FirstOrDefault(l => l.Contains("PID:"))?.Split(":").Last().Trim().Split(" ").First();
+                if (!string.IsNullOrWhiteSpace(pid))
+                {
+                    service.ProcessId = Convert.ToUInt64(pid);
+                    var psOutput = ReadProcessOutput("ps", $"-p {pid} -o %cpu,vsz,rss");
+                    var psOutputLines = psOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    // Output of above ps command
+                    //%CPU   VSZ   RSS
+                    // 0.0  1463  3242 
+
+                    if (psOutputLines.Length == 2)
+                    {
+                        var values = psOutputLines.Last().Trim().Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+
+                        service.CpuUsage = Convert.ToUInt64(Math.Round(Convert.ToDecimal(values[0].Trim()), MidpointRounding.AwayFromZero));
+                        service.MemoryPrivateBytes = Convert.ToUInt64(values[1].Trim());
+                        service.MemoryWorkingSet = Convert.ToUInt64(values[2].Trim());
+                    }
+                }
+
+                return service;
+            }
+
+            return null;
         }
 
         public void SetServiceAction(string serviceName, ServiceAction action)

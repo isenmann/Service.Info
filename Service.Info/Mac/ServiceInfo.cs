@@ -9,6 +9,11 @@ namespace Service.Info.Mac
             return new List<Service>();
         }
 
+        public Service GetService(string serviceName)
+        {
+            return null;
+        }
+
         public void SetServiceAction(string serviceName, ServiceAction action)
         {
             
