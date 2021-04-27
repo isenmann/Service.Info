@@ -28,10 +28,12 @@ namespace Service.Info.Windows
 
             foreach (var queryObject in win32Service.Get())
             {
-                var service = new Service();
-                var processId = GetPropertyValue<uint>(queryObject["ProcessId"]);
+                var service = new Service
+                {
+                    Name = GetPropertyString(queryObject["Name"]),
+                    ProcessId = GetPropertyValue<uint>(queryObject["ProcessId"])
+                };
                 var state = GetPropertyString(queryObject["State"]);
-                service.Name = GetPropertyString(queryObject["Name"]);
                 service.State = state switch
                 {
                     "Stopped" => ServiceState.Stopped,
@@ -48,7 +50,7 @@ namespace Service.Info.Windows
                 if (service.State == ServiceState.Running)
                 {
                     using var win32PerfFormattedDataPerfProcProcess = new ManagementObjectSearcher(
-                        $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {processId}");
+                        $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}");
 
                     foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
                     {

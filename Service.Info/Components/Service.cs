@@ -6,6 +6,7 @@ namespace Service.Info
     {
         public string Name { get; internal set; } = string.Empty;
         public ServiceState State { get; internal set; } = ServiceState.Unknown;
+        public UInt64 ProcessId { get; internal set; }
         public UInt64 CpuUsage { get; internal set; }
         public UInt64 MemoryWorkingSet { get; internal set; }
         public UInt64 MemoryPrivateBytes { get; internal set; }
@@ -14,6 +15,7 @@ namespace Service.Info
         {
             return
                 "Name: " + Name + Environment.NewLine +
+                "ProcessId: " + ProcessId + Environment.NewLine +
                 "State: " + State + Environment.NewLine +
                 "CpuUsage: " + CpuUsage + Environment.NewLine +
                 "MemoryWorkingSet: " + MemoryWorkingSet + Environment.NewLine +

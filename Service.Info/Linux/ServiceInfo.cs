@@ -39,6 +39,7 @@ namespace Service.Info.Linux
                 var pid = systemctlOutputLines.FirstOrDefault(l => l.Contains("PID:"))?.Split(":").Last().Trim().Split(" ").First();
                 if (!string.IsNullOrWhiteSpace(pid))
                 {
+                    service.ProcessId = Convert.ToUInt64(pid);
                     var psOutput = ReadProcessOutput("ps", $"-p {pid} -o %cpu,vsz,rss");
                     var psOutputLines = psOutput.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
                     // Output of above ps command
