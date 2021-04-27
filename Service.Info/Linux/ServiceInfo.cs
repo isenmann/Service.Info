@@ -29,7 +29,7 @@ namespace Service.Info.Linux
                     service.State = ServiceState.Unknown;
                 }
                     
-                var split = line.Split(" ");
+                var split = line.Split(' ');
 
                 service.Name = split.Last();
 
@@ -37,7 +37,7 @@ namespace Service.Info.Linux
                 var systemctlOutput = ReadProcessOutput("systemctl", $"status {service.Name}");
                 var systemctlOutputLines = systemctlOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-                var pid = systemctlOutputLines.FirstOrDefault(l => l.Contains("PID:"))?.Split(":").Last().Trim().Split(" ").First();
+                var pid = systemctlOutputLines.FirstOrDefault(l => l.Contains("PID:"))?.Split(':').Last().Trim().Split(' ').First();
                 if (!string.IsNullOrWhiteSpace(pid))
                 {
                     service.ProcessId = Convert.ToUInt64(pid);
@@ -49,7 +49,7 @@ namespace Service.Info.Linux
 
                     if (psOutputLines.Length == 2)
                     {
-                        var values = psOutputLines.Last().Trim().Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+                        var values = psOutputLines.Last().Trim().Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
                         
                         service.CpuUsage = Convert.ToUInt64(Math.Round(Convert.ToDecimal(values[0].Trim()), MidpointRounding.AwayFromZero));
                         service.MemoryPrivateBytes = Convert.ToUInt64(values[1].Trim());
@@ -70,7 +70,7 @@ namespace Service.Info.Linux
 
             foreach (var line in lines)
             {
-                var name = line.Split(" ").Last();
+                var name = line.Split(' ').Last();
                 if (!name.Equals(serviceName))
                 {
                     continue;
@@ -97,7 +97,7 @@ namespace Service.Info.Linux
                 var systemctlOutput = ReadProcessOutput("systemctl", $"status {service.Name}");
                 var systemctlOutputLines = systemctlOutput.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-                var pid = systemctlOutputLines.FirstOrDefault(l => l.Contains("PID:"))?.Split(":").Last().Trim().Split(" ").First();
+                var pid = systemctlOutputLines.FirstOrDefault(l => l.Contains("PID:"))?.Split(':').Last().Trim().Split(' ').First();
                 if (!string.IsNullOrWhiteSpace(pid))
                 {
                     service.ProcessId = Convert.ToUInt64(pid);
@@ -109,7 +109,7 @@ namespace Service.Info.Linux
 
                     if (psOutputLines.Length == 2)
                     {
-                        var values = psOutputLines.Last().Trim().Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+                        var values = psOutputLines.Last().Trim().Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
 
                         service.CpuUsage = Convert.ToUInt64(Math.Round(Convert.ToDecimal(values[0].Trim()), MidpointRounding.AwayFromZero));
                         service.MemoryPrivateBytes = Convert.ToUInt64(values[1].Trim());

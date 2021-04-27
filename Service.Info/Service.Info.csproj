@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Daniel Isenmann</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/isenmann/Service.Info</PackageProjectUrl>
     <RepositoryUrl>https://github.com/isenmann/Service.Info</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Computer;Service;Info;Information;NET Standard;Windows;Linux;macOS</PackageTags>
-    <Description>Service.Info is a .NET Standard 2.1 library for receiving information about services/daemons on Windows and Linux. Mac support will maybe follow</Description>
+    <Description>Service.Info is a .NET Standard 2.0 library for receiving information about services/daemons on Windows and Linux. Mac support will maybe follow</Description>
     <Version>1.0.0.3</Version>
     <Product>Service.Info</Product>
     <Company>Daniel Isenmann</Company>

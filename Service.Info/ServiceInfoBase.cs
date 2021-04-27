@@ -24,11 +24,14 @@ namespace Service.Info
         {
             try
             {
-                using var process = StartProcess(cmd, args);
-                using var streamReader = process.StandardOutput;
-                process.WaitForExit();
-
-                return streamReader.ReadToEnd().Trim();
+                using (var process = StartProcess(cmd, args))
+                {
+                    using (var streamReader = process.StandardOutput)
+                    {
+                        process.WaitForExit();
+                        return streamReader.ReadToEnd().Trim();
+                    }
+                }
             }
             catch
             {

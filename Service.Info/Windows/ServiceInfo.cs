@@ -24,87 +24,130 @@ namespace Service.Info.Windows
         public List<Service> GetServiceList()
         {
             var services = new List<Service>();
-            using var win32Service = new ManagementObjectSearcher("SELECT * FROM Win32_Service");
-
-            foreach (var queryObject in win32Service.Get())
+            using (var win32Service = new ManagementObjectSearcher("SELECT * FROM Win32_Service"))
             {
-                var service = new Service
+                foreach (var queryObject in win32Service.Get())
                 {
-                    Name = GetPropertyString(queryObject["Name"]),
-                    ProcessId = GetPropertyValue<uint>(queryObject["ProcessId"])
-                };
-                var state = GetPropertyString(queryObject["State"]);
-                service.State = state switch
-                {
-                    "Stopped" => ServiceState.Stopped,
-                    "Start Pending" => ServiceState.StartPending,
-                    "Stop Pending" => ServiceState.StopPending,
-                    "Running" => ServiceState.Running,
-                    "Continue Pending" => ServiceState.ContinuePending,
-                    "Pause Pending" => ServiceState.PausePending,
-                    "Paused" => ServiceState.Paused,
-                    "Unknown" => ServiceState.Unknown,
-                    _ => service.State
-                };
-
-                if (service.State == ServiceState.Running)
-                {
-                    using var win32PerfFormattedDataPerfProcProcess = new ManagementObjectSearcher(
-                        $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}");
-
-                    foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
+                    var service = new Service
                     {
-                        service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
-                        service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
-                        service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
+                        Name = GetPropertyString(queryObject["Name"]),
+                        ProcessId = GetPropertyValue<uint>(queryObject["ProcessId"])
+                    };
+                    var state = GetPropertyString(queryObject["State"]);
+                    switch (state)
+                    {
+                        case "Stopped":
+                            service.State = ServiceState.Stopped;
+                            break;
+                        case "Start Pending":
+                            service.State = ServiceState.StartPending;
+                            break;
+                        case "Stop Pending":
+                            service.State = ServiceState.StopPending;
+                            break;
+                        case "Running":
+                            service.State = ServiceState.Running;
+                            break;
+                        case "Continue Pending":
+                            service.State = ServiceState.ContinuePending;
+                            break;
+                        case "Pause Pending":
+                            service.State = ServiceState.PausePending;
+                            break;
+                        case "Paused":
+                            service.State = ServiceState.Paused;
+                            break;
+                        case "Unknown":
+                            service.State = ServiceState.Unknown;
+                            break;
+                        default:
+                            service.State = service.State;
+                            break;
                     }
-                }
 
-                services.Add(service);
+                    if (service.State == ServiceState.Running)
+                    {
+                        using (var win32PerfFormattedDataPerfProcProcess = new ManagementObjectSearcher(
+                            $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}")
+                        )
+                        {
+
+                            foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
+                            {
+                                service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
+                                service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
+                                service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
+                            }
+                        }
+                    }
+
+                    services.Add(service);
+                }
             }
-            
+
             return services;
         }
 
         public Service GetService(string serviceName)
         {
-            using var win32Service = new ManagementObjectSearcher($"SELECT * FROM Win32_Service WHERE Name = '{serviceName}'");
-
-            foreach (var queryObject in win32Service.Get())
+            using (var win32Service = new ManagementObjectSearcher($"SELECT * FROM Win32_Service WHERE Name = '{serviceName}'"))
             {
-                var service = new Service
+                foreach (var queryObject in win32Service.Get())
                 {
-                    Name = GetPropertyString(queryObject["Name"]),
-                    ProcessId = GetPropertyValue<uint>(queryObject["ProcessId"])
-                };
-                var state = GetPropertyString(queryObject["State"]);
-                service.State = state switch
-                {
-                    "Stopped" => ServiceState.Stopped,
-                    "Start Pending" => ServiceState.StartPending,
-                    "Stop Pending" => ServiceState.StopPending,
-                    "Running" => ServiceState.Running,
-                    "Continue Pending" => ServiceState.ContinuePending,
-                    "Pause Pending" => ServiceState.PausePending,
-                    "Paused" => ServiceState.Paused,
-                    "Unknown" => ServiceState.Unknown,
-                    _ => service.State
-                };
-
-                if (service.State == ServiceState.Running)
-                {
-                    using var win32PerfFormattedDataPerfProcProcess = new ManagementObjectSearcher(
-                        $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}");
-
-                    foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
+                    var service = new Service
                     {
-                        service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
-                        service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
-                        service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
+                        Name = GetPropertyString(queryObject["Name"]),
+                        ProcessId = GetPropertyValue<uint>(queryObject["ProcessId"])
+                    };
+                    var state = GetPropertyString(queryObject["State"]);
+                    switch (state)
+                    {
+                        case "Stopped":
+                            service.State = ServiceState.Stopped;
+                            break;
+                        case "Start Pending":
+                            service.State = ServiceState.StartPending;
+                            break;
+                        case "Stop Pending":
+                            service.State = ServiceState.StopPending;
+                            break;
+                        case "Running":
+                            service.State = ServiceState.Running;
+                            break;
+                        case "Continue Pending":
+                            service.State = ServiceState.ContinuePending;
+                            break;
+                        case "Pause Pending":
+                            service.State = ServiceState.PausePending;
+                            break;
+                        case "Paused":
+                            service.State = ServiceState.Paused;
+                            break;
+                        case "Unknown":
+                            service.State = ServiceState.Unknown;
+                            break;
+                        default:
+                            service.State = service.State;
+                            break;
                     }
-                }
 
-                return service;
+                    if (service.State == ServiceState.Running)
+                    {
+                        using (var win32PerfFormattedDataPerfProcProcess = new ManagementObjectSearcher(
+                            $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}")
+                        )
+                        {
+                            foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
+                            {
+                                service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
+                                service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
+                                service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
+                            }
+                        }
+                    }
+
+                    return service;
+                }
             }
 
             return null;
@@ -112,19 +155,21 @@ namespace Service.Info.Windows
 
         public void SetServiceAction(string serviceName, ServiceAction action)
         {
-            using var classInstance = new ManagementObject($"Win32_Service.Name = '{serviceName}'", null);
-            switch (action)
+            using (var classInstance = new ManagementObject($"Win32_Service.Name = '{serviceName}'", null))
             {
-                case ServiceAction.Stop:
-                    classInstance.InvokeMethod("StopService", null, null);
-                    break;
-                case ServiceAction.Start:
-                    classInstance.InvokeMethod("StartService", null, null);
-                    break;
-                case ServiceAction.Restart:
-                    classInstance.InvokeMethod("StopService", null, null);
-                    classInstance.InvokeMethod("StartService", null, null);
-                    break;
+                switch (action)
+                {
+                    case ServiceAction.Stop:
+                        classInstance.InvokeMethod("StopService", null, null);
+                        break;
+                    case ServiceAction.Start:
+                        classInstance.InvokeMethod("StartService", null, null);
+                        break;
+                    case ServiceAction.Restart:
+                        classInstance.InvokeMethod("StopService", null, null);
+                        classInstance.InvokeMethod("StartService", null, null);
+                        break;
+                }
             }
         }
     }
