@@ -24,6 +24,16 @@ namespace Service.Info.Windows
         public List<Service> GetServiceList()
         {
             var services = new List<Service>();
+            uint numberOfLogicalProcessors = 1;
+
+            using (var win32ComputerSystem = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem"))
+            {
+                foreach (var queryObject in win32ComputerSystem.Get())
+                {
+                    numberOfLogicalProcessors = GetPropertyValue<uint>(queryObject["NumberOfLogicalProcessors"]);
+                }
+            }
+
             using (var win32Service = new ManagementObjectSearcher("SELECT * FROM Win32_Service"))
             {
                 foreach (var queryObject in win32Service.Get())
@@ -71,10 +81,9 @@ namespace Service.Info.Windows
                             $"SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = {service.ProcessId}")
                         )
                         {
-
                             foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
                             {
-                                service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
+                                service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]) / numberOfLogicalProcessors;
                                 service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
                                 service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
                             }
@@ -90,6 +99,16 @@ namespace Service.Info.Windows
 
         public Service GetService(string serviceName)
         {
+            uint numberOfLogicalProcessors = 1;
+
+            using (var win32ComputerSystem = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem"))
+            {
+                foreach (var queryObject in win32ComputerSystem.Get())
+                {
+                    numberOfLogicalProcessors = GetPropertyValue<uint>(queryObject["NumberOfLogicalProcessors"]);
+                }
+            }
+
             using (var win32Service = new ManagementObjectSearcher($"SELECT * FROM Win32_Service WHERE Name = '{serviceName}'"))
             {
                 foreach (var queryObject in win32Service.Get())
@@ -139,7 +158,7 @@ namespace Service.Info.Windows
                         {
                             foreach (var queryObj in win32PerfFormattedDataPerfProcProcess.Get())
                             {
-                                service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]);
+                                service.CpuUsage = GetPropertyValue<ulong>(queryObj["PercentProcessorTime"]) / numberOfLogicalProcessors;
                                 service.MemoryPrivateBytes = GetPropertyValue<ulong>(queryObj["PrivateBytes"]);
                                 service.MemoryWorkingSet = GetPropertyValue<ulong>(queryObj["WorkingSet"]);
                             }
